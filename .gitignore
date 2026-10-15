@@ -1,0 +1,7 @@
+.terraform/
+*.tfstate*
+*.tfplan
+.env*
+credentials-*
+kubeconfig*
+node_modules/
