@@ -1,0 +1,7 @@
+# 2026-10-21: MiniStack lost all state after a laptop reboot
+
+- **What happened:** After a reboot, MiniStack came back empty. `aws s3 ls` returned nothing, the `tfstate` bucket created on 2026-10-20 was gone, and `/state` in the container was empty.
+- **Impact:** We lost the Terraform backend bucket. No Terraform state existed yet (Phase 1 hadn't started), so no real data was lost. After Phase 1, this would have orphaned every resource Terraform manages.
+- **Root cause:** `PERSIST_STATE=1` writes state to `/state` only on a clean stop (SIGTERM). The reboot didn't stop MiniStack cleanly, so it never saved. We confirmed this with an experiment: create a bucket, run `docker restart ministack`, and `s3.json` appeared in `/state` while the bucket survived. Why the reboot skipped the clean stop is still unconfirmed.
+- **Fix:** `make down` now runs `docker stop ministack mailpit`, so state is saved. `make up` waits up to 60s for MiniStack, then creates `tfstate` only if it's missing (`head-bucket || mb`). Verified with `make down`, `docker rm`, recreate, `make up`: the bucket survived through the `ministack-state` volume.
+- **Lesson:** "Persistent" doesn't say *when* it persists. Save-on-shutdown loses everything on a crash, so stop stateful containers cleanly. The data lives in the volume, not the container.
