@@ -26,7 +26,7 @@ done
 
 [ "$(docker inspect -f '{{json .NetworkSettings.Networks.kind}}' $REG)" != null ] || docker network connect kind $REG
 
-kubectl apply -f - <<EOF
+kubectl --context kind-$CLUSTER apply -f - <<EOF
 apiVersion: v1
 kind: ConfigMap
 metadata:
