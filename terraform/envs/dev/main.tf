@@ -42,3 +42,7 @@ resource "aws_ecr_repository" "app" {
 output "jobs_queue_url" {
   value = aws_sqs_queue.jobs.url
 }
+
+output "backups_bucket" {
+  value = aws_s3_bucket.backups.bucket
+}
