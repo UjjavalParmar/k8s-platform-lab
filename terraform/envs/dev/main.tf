@@ -46,3 +46,7 @@ output "jobs_queue_url" {
 output "backups_bucket" {
   value = aws_s3_bucket.backups.bucket
 }
+
+output "jobs_dlq_url" {
+  value = aws_sqs_queue.jobs_dlq.url
+}
